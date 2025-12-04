@@ -1,0 +1,9 @@
+com\dannttee\mundopelotaapi\model\Usuario$Rol.class
+com\dannttee\mundopelotaapi\UsuariosApplication.class
+com\dannttee\mundopelotaapi\model\ApiResponse.class
+com\dannttee\mundopelotaapi\repository\UsuarioRepository.class
+com\dannttee\mundopelotaapi\DataSeeder.class
+com\dannttee\mundopelotaapi\controller\HealthController.class
+com\dannttee\mundopelotaapi\model\Usuario.class
+com\dannttee\mundopelotaapi\controller\UsuarioController.class
+com\dannttee\mundopelotaapi\service\UsuarioService.class

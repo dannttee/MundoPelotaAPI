@@ -1,0 +1,8 @@
+com\dannttee\mundopelotaapi\model\Pelota.class
+com\dannttee\mundopelotaapi\CatalogoApplication.class
+com\dannttee\mundopelotaapi\repository\PelotaRepository.class
+com\dannttee\mundopelotaapi\service\PelotaService.class
+com\dannttee\mundopelotaapi\controller\PelotaController.class
+com\dannttee\mundopelotaapi\model\ApiResponse.class
+com\dannttee\mundopelotaapi\DataSeeder.class
+com\dannttee\mundopelotaapi\controller\HealthController.class

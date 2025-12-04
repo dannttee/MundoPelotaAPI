@@ -1,0 +1,7 @@
+com\dannttee\mundopelotaapi\CarritoApplication.class
+com\dannttee\mundopelotaapi\service\CarritoService.class
+com\dannttee\mundopelotaapi\model\CarritoItem.class
+com\dannttee\mundopelotaapi\model\ApiResponse.class
+com\dannttee\mundopelotaapi\controller\HealthController.class
+com\dannttee\mundopelotaapi\repository\CarritoItemRepository.class
+com\dannttee\mundopelotaapi\controller\CarritoController.class
