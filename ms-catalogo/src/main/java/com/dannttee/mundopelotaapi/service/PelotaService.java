@@ -15,6 +15,16 @@ public class PelotaService {
     @Autowired
     private PelotaRepository pelotaRepository;
 
+    /**
+     * @param id ID de la pelota.
+     * @return El stock disponible (Integer) o null si la pelota no existe.
+     */
+    public Integer consultarStock(@NonNull Long id) {
+        return pelotaRepository.findById(id)
+                .map(Pelota::getStock) 
+                .orElse(null);        
+    }
+
     public List<Pelota> obtenerTodas() {
         return pelotaRepository.findAll();
     }
@@ -23,12 +33,12 @@ public class PelotaService {
         return pelotaRepository.findById(id);
     }
 
-    // Renombrado a 'crear' para que coincida con tu Controller
+    // Renombrado a crear para que coincida con tu Controller
     public Pelota crear(@NonNull Pelota pelota) {
         return pelotaRepository.save(pelota);
     }
 
-    // Método nuevo para 'actualizar'
+    // Método nuevo para actualizar
     public Pelota actualizar(@NonNull Long id, @NonNull Pelota pelotaActualizada) {
         return pelotaRepository.findById(id).map(pelotaExistente -> {
             pelotaExistente.setNombre(pelotaActualizada.getNombre());
@@ -42,7 +52,7 @@ public class PelotaService {
         }).orElse(null);
     }
 
-    // Renombrado a 'eliminar'
+    // Renombrado a eliminar
     public boolean eliminar(@NonNull Long id) {
         if (pelotaRepository.existsById(id)) {
             pelotaRepository.deleteById(id);
@@ -50,8 +60,7 @@ public class PelotaService {
         }
         return false;
     }
-
-    // Método nuevo para filtrar
+    
     public List<Pelota> filtrarPorDeporte(@NonNull String deporte) {
         return pelotaRepository.findByDeporte(deporte);
     }
