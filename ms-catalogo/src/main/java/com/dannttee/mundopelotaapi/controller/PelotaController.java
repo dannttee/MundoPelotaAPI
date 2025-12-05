@@ -17,6 +17,7 @@ public class PelotaController {
     @Autowired
     private PelotaService pelotaService;
 
+    // CONSULTA DE STOCK (Usado por ms-carrito)
     @GetMapping("/stock/{id}")
     public ResponseEntity<Integer> getStockDisponible(@PathVariable @NonNull Long id) {
         Integer stock = pelotaService.consultarStock(id);
@@ -28,11 +29,13 @@ public class PelotaController {
         return ResponseEntity.ok(stock); 
     }
 
+    // LISTAR TODO
     @GetMapping
     public ResponseEntity<List<Pelota>> obtenerTodas() {
         return ResponseEntity.ok(pelotaService.obtenerTodas()); 
     }
 
+    // OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<Pelota> obtenerPorId(@PathVariable @NonNull Long id) {
         return pelotaService.obtenerPorId(id)
@@ -40,17 +43,20 @@ public class PelotaController {
                 .orElse(ResponseEntity.notFound().build()); 
     }
 
+    // FILTRAR POR DEPORTE
     @GetMapping("/deporte/{deporte}")
     public ResponseEntity<List<Pelota>> filtrarPorDeporte(@PathVariable @NonNull String deporte) {
         return ResponseEntity.ok(pelotaService.filtrarPorDeporte(deporte)); 
     }
 
+    // CREAR NUEVA PELOTA (Este método soluciona el error POST Not Supported)
     @PostMapping
     public ResponseEntity<Pelota> crear(@RequestBody @NonNull Pelota pelota) {
         Pelota nuevaPelota = pelotaService.crear(pelota);
         return ResponseEntity.status(201).body(nuevaPelota); 
     }
 
+    // ACTUALIZAR (PUT)
     @PutMapping("/{id}")
     public ResponseEntity<Pelota> actualizar(@PathVariable @NonNull Long id, @RequestBody @NonNull Pelota pelotaActualizada) {
         Optional<Pelota> pelotaActualizadaOpt = pelotaService.actualizar(id, pelotaActualizada);
@@ -60,6 +66,7 @@ public class PelotaController {
                 .orElse(ResponseEntity.notFound().build()); 
     }
 
+    // ELIMINAR (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable @NonNull Long id) {
         if (pelotaService.eliminar(id)) {

@@ -18,7 +18,7 @@ public class CarritoController {
 
     @Autowired
     private CarritoService carritoService;
-
+    
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarritoItem>>> obtenerCarrito(@RequestParam Long usuarioId) {
         List<CarritoItem> items = carritoService.obtenerCarrito(usuarioId);
@@ -27,11 +27,18 @@ public class CarritoController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CarritoItem>> agregarAlCarrito(@RequestBody Map<String, Object> body) {
+
         Long usuarioId = ((Number) body.get("usuarioId")).longValue();
         Long pelotaId = ((Number) body.get("pelotaId")).longValue();
         Integer cantidad = ((Number) body.get("cantidad")).intValue();
 
         CarritoItem item = carritoService.agregarAlCarrito(usuarioId, pelotaId, cantidad);
+        
+        if (item == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Stock insuficiente o ID de pelota inválido"));
+        }
+        
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Item agregado al carrito", item));
     }
@@ -63,6 +70,7 @@ public class CarritoController {
         if (carritoService.vaciarCarrito(usuarioId)) {
             return ResponseEntity.ok(ApiResponse.success("Carrito vaciado", ""));
         }
+       
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error al vaciar carrito"));
     }
