@@ -1,0 +1,42 @@
+# Maven - Compilación y Build
+target/
+**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Java - Archivos Binarios
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+
+# Logs y Archivos Temporales
+*.log
+*.tmp
+*.bak
+*.swp
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db

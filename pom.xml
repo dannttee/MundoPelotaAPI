@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ms-usuarios</module>
+        <module>ms-usuario</module>
         <module>ms-catalogo</module>
         <module>ms-carrito</module>
     </modules>
