@@ -14,32 +14,32 @@ public class PelotaService {
 
     @Autowired
     private PelotaRepository pelotaRepository;
-
+    
     /**
-     * @param id ID de la pelota.
-     * @return El stock disponible (Integer) o null si la pelota no existe.
+       @param id ID de la pelota.
+       @return El stock disponible (Integer) o null si la pelota no existe.
      */
     public Integer consultarStock(@NonNull Long id) {
         return pelotaRepository.findById(id)
                 .map(Pelota::getStock) 
-                .orElse(null);        
+                .orElse(null);         
     }
 
     public List<Pelota> obtenerTodas() {
-        return pelotaRepository.findAll();
+        return pelotaRepository.findAllNative(); 
     }
 
     public Optional<Pelota> obtenerPorId(@NonNull Long id) {
         return pelotaRepository.findById(id);
     }
 
-    // Renombrado a crear para que coincida con tu Controller
+
     public Pelota crear(@NonNull Pelota pelota) {
         return pelotaRepository.save(pelota);
     }
 
-    // Método nuevo para actualizar
-    public Pelota actualizar(@NonNull Long id, @NonNull Pelota pelotaActualizada) {
+
+    public Optional<Pelota> actualizar(@NonNull Long id, @NonNull Pelota pelotaActualizada) { 
         return pelotaRepository.findById(id).map(pelotaExistente -> {
             pelotaExistente.setNombre(pelotaActualizada.getNombre());
             pelotaExistente.setMarca(pelotaActualizada.getMarca());
@@ -49,10 +49,9 @@ public class PelotaService {
             pelotaExistente.setDescripcion(pelotaActualizada.getDescripcion());
             pelotaExistente.setImageUrl(pelotaActualizada.getImageUrl());
             return pelotaRepository.save(pelotaExistente);
-        }).orElse(null);
+        }); 
     }
 
-    // Renombrado a eliminar
     public boolean eliminar(@NonNull Long id) {
         if (pelotaRepository.existsById(id)) {
             pelotaRepository.deleteById(id);
@@ -60,7 +59,8 @@ public class PelotaService {
         }
         return false;
     }
-    
+
+    // Método nuevo para filtrar
     public List<Pelota> filtrarPorDeporte(@NonNull String deporte) {
         return pelotaRepository.findByDeporte(deporte);
     }
