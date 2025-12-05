@@ -29,7 +29,6 @@ public class PelotaController {
         return ResponseEntity.ok(stock); 
     }
 
-    // LISTAR TODO
     @GetMapping
     public ResponseEntity<List<Pelota>> obtenerTodas() {
         return ResponseEntity.ok(pelotaService.obtenerTodas()); 
