@@ -18,7 +18,7 @@ public class CarritoController {
 
     @Autowired
     private CarritoService carritoService;
-    
+
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarritoItem>>> obtenerCarrito(@RequestParam Long usuarioId) {
         List<CarritoItem> items = carritoService.obtenerCarrito(usuarioId);
@@ -33,12 +33,12 @@ public class CarritoController {
         Integer cantidad = ((Number) body.get("cantidad")).intValue();
 
         CarritoItem item = carritoService.agregarAlCarrito(usuarioId, pelotaId, cantidad);
-        
+
         if (item == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Stock insuficiente o ID de pelota inválido"));
         }
-        
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Item agregado al carrito", item));
     }
@@ -70,8 +70,21 @@ public class CarritoController {
         if (carritoService.vaciarCarrito(usuarioId)) {
             return ResponseEntity.ok(ApiResponse.success("Carrito vaciado", ""));
         }
-       
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error al vaciar carrito"));
+    }
+
+    // --- NUEVO ENDPOINT CHECKOUT ---
+    @PostMapping("/{usuarioId}/checkout")
+    public ResponseEntity<ApiResponse<String>> checkout(@PathVariable Long usuarioId) {
+        boolean ok = carritoService.vaciarCarrito(usuarioId);
+        if (ok) {
+            return ResponseEntity.ok(
+                    ApiResponse.success("Checkout realizado. Carrito vaciado para usuario " + usuarioId, "")
+            );
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("No se pudo realizar el checkout"));
     }
 }
