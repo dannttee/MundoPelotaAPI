@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -55,5 +56,65 @@ public class UsuarioController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("Usuario no encontrado"));
+    }
+
+    // ===== 🆕 NUEVOS ENDPOINTS =====
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<Usuario>> register(@RequestBody Usuario usuario) {
+        try {
+            Usuario nuevo = usuarioService.crear(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success("Usuario creado correctamente", nuevo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Error al registrar: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Usuario>> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            Optional<Usuario> usuario = usuarioService.obtenerPorEmail(loginRequest.getEmail());
+            
+            if (usuario.isPresent() && usuario.get().getPassword().equals(loginRequest.getPassword())) {
+                return ResponseEntity.ok(ApiResponse.success("Login exitoso", usuario.get()));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(ApiResponse.error("Credenciales inválidas"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Error en login: " + e.getMessage()));
+        }
+    }
+}
+
+// ===== DTO PARA LOGIN =====
+class LoginRequest {
+    private String email;
+    private String password;
+
+    public LoginRequest() {}
+
+    public LoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
