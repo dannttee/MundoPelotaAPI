@@ -2,6 +2,7 @@ package com.dannttee.mundopelotaapi.controller;
 
 import com.dannttee.mundopelotaapi.model.ApiResponse;
 import com.dannttee.mundopelotaapi.model.CarritoItem;
+import com.dannttee.mundopelotaapi.dto.OrdenResponse;
 import com.dannttee.mundopelotaapi.service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,6 @@ public class CarritoController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CarritoItem>> agregarAlCarrito(@RequestBody Map<String, Object> body) {
-
         Long usuarioId = ((Number) body.get("usuarioId")).longValue();
         Long pelotaId = ((Number) body.get("pelotaId")).longValue();
         Integer cantidad = ((Number) body.get("cantidad")).intValue();
@@ -75,16 +75,35 @@ public class CarritoController {
                 .body(ApiResponse.error("Error al vaciar carrito"));
     }
 
-    // --- NUEVO ENDPOINT CHECKOUT ---
+    // ========== NUEVO ENDPOINT CHECKOUT ==========
     @PostMapping("/{usuarioId}/checkout")
-    public ResponseEntity<ApiResponse<String>> checkout(@PathVariable Long usuarioId) {
-        boolean ok = carritoService.vaciarCarrito(usuarioId);
-        if (ok) {
-            return ResponseEntity.ok(
-                    ApiResponse.success("Checkout realizado. Carrito vaciado para usuario " + usuarioId, "")
-            );
+    public ResponseEntity<ApiResponse<OrdenResponse>> checkout(@PathVariable Long usuarioId) {
+        try {
+            // Obtener items del carrito
+            List<CarritoItem> items = carritoService.obtenerCarrito(usuarioId);
+
+            if (items == null || items.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("El carrito está vacío"));
+            }
+
+            // Crear la orden con detalles
+            OrdenResponse orden = carritoService.crearOrden(usuarioId, items);
+
+            // Vaciar el carrito después de crear la orden
+            carritoService.vaciarCarrito(usuarioId);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success("Orden creada exitosamente", orden));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("Error en checkout: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Error al procesar el checkout: " + e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("No se pudo realizar el checkout"));
     }
 }
