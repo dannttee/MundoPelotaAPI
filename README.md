@@ -1,5 +1,5 @@
 Mundo Pelota API
-API REST para la plataforma de e-commerce de equipos deportivos. Backend desarrollado con Spring Boot.
+API REST para la plataforma de e-commerce de equipos deportivos. Backend desarrollado con Spring Boot con arquitectura de microservicios.
 
 🌐 Descripción
 Mundo Pelota API es el servidor backend que gestiona:
@@ -34,8 +34,10 @@ API Documentation: Swagger/Springdoc OpenAPI
 
 Build Tool: Gradle
 
+Despliegue: Render (Microservicios)
+
 Patrón de Arquitectura
-Patrón: MVC/Layered Architecture
+Patrón: MVC/Layered Architecture + Microservicios
 
 Layers: Controller → Service → Repository → Database
 
@@ -43,25 +45,103 @@ DTOs: Separación entre modelos internos y API responses
 
 Exception Handling: Manejo centralizado de errores
 
+🚀 Acceso a las APIs en Render
+📍 MS Usuarios (Autenticación)
+URL Base: https://ms-usuario-5m0i.onrender.com
+
+Swagger UI: https://ms-usuario-5m0i.onrender.com/swagger-ui.html
+
+OpenAPI Docs: https://ms-usuario-5m0i.onrender.com/v3/api-docs
+
+Endpoints Principales:
+
+POST /auth/login - Login
+
+POST /auth/register - Registro
+
+POST /auth/refresh - Refresh Token
+
+GET /usuarios/perfil - Obtener perfil
+
+PUT /usuarios/perfil - Actualizar perfil
+
+POST /usuarios/cambiar-contraseña - Cambiar contraseña
+
+📍 MS Catálogo (Productos)
+URL Base: https://ms-catalogo-hora.onrender.com
+
+Swagger UI: https://ms-catalogo-hora.onrender.com/swagger-ui.html
+
+OpenAPI Docs: https://ms-catalogo-hora.onrender.com/v3/api-docs
+
+Endpoints Principales:
+
+GET /productos - Listar productos
+
+GET /productos/{id} - Obtener producto
+
+POST /productos - Crear producto (Admin)
+
+PUT /productos/{id} - Actualizar producto (Admin)
+
+DELETE /productos/{id} - Eliminar producto (Admin)
+
+📍 MS Carrito (Compras)
+URL Base: https://ms-carrito-zqlc.onrender.com
+
+Swagger UI: https://ms-carrito-zqlc.onrender.com/swagger-ui.html
+
+OpenAPI Docs: https://ms-carrito-zqlc.onrender.com/v3/api-docs
+
+Endpoints Principales:
+
+GET /carrito - Obtener carrito
+
+POST /carrito/items - Agregar item
+
+PUT /carrito/items/{itemId} - Actualizar cantidad
+
+DELETE /carrito/items/{itemId} - Eliminar item
+
+POST /ordenes/checkout - Procesar compra
+
+GET /ordenes - Historial de órdenes
+
 📋 Estructura del Proyecto
 text
 mundopelota-api/
-├── src/main/java/com/example/mundopelota/
-│   ├── controller/          # Controladores REST
-│   ├── service/             # Lógica de negocio
-│   ├── repository/          # Acceso a datos
-│   ├── model/               # Entidades JPA
-│   ├── dto/                 # Data Transfer Objects
-│   ├── security/            # Configuración de seguridad
-│   ├── exception/           # Excepciones personalizadas
-│   ├── config/              # Configuraciones de la app
-│   └── MundoPelotaApiApplication.java
-├── src/main/resources/
-│   ├── application.properties
-│   ├── application-dev.properties
-│   └── application-prod.properties
-├── build.gradle
-└── README.md
+├── ms-usuarios/                    # Microservicio de Usuarios
+│   ├── src/main/java/com/example/mundopelota/
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   ├── model/
+│   │   ├── dto/
+│   │   ├── security/
+│   │   └── MsUsuariosApplication.java
+│   └── build.gradle
+│
+├── ms-catalogo/                    # Microservicio de Catálogo
+│   ├── src/main/java/com/example/mundopelota/
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   ├── model/
+│   │   ├── dto/
+│   │   └── MsCatalogoApplication.java
+│   └── build.gradle
+│
+├── ms-carrito/                     # Microservicio de Carrito
+│   ├── src/main/java/com/example/mundopelota/
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   ├── model/
+│   │   ├── dto/
+│   │   └── MsCarritoApplication.java
+│   └── build.gradle
+│
+└── docker-compose.yml              # Orquestación local
 🔐 Autenticación
 Sistema JWT (JSON Web Token)
 Login retorna un token JWT válido por 24 horas
@@ -75,11 +155,11 @@ ROLE_USER: Usuario estándar (comprador)
 
 ROLE_ADMIN: Administrador (gestión de productos)
 
-📡 Endpoints Principales
-Autenticación
+📡 Endpoints Detallados
+🔑 MS USUARIOS - Autenticación
 Login
 text
-POST /api/auth/login
+POST https://ms-usuario-5m0i.onrender.com/auth/login
 Content-Type: application/json
 
 {
@@ -101,7 +181,7 @@ Response 200:
 }
 Registro
 text
-POST /api/auth/register
+POST https://ms-usuario-5m0i.onrender.com/auth/register
 Content-Type: application/json
 
 {
@@ -114,7 +194,7 @@ Content-Type: application/json
 Response 201: Created
 Refresh Token
 text
-POST /api/auth/refresh
+POST https://ms-usuario-5m0i.onrender.com/auth/refresh
 Authorization: Bearer <refresh_token>
 
 Response 200:
@@ -122,10 +202,51 @@ Response 200:
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "expiresIn": 86400
 }
-Productos
+Obtener Perfil
+text
+GET https://ms-usuario-5m0i.onrender.com/usuarios/perfil
+Authorization: Bearer <token>
+
+Response 200:
+{
+  "id": 1,
+  "nombre": "Juan Pérez",
+  "email": "juan@example.com",
+  "telefono": "+56 9 12345678",
+  "direccion": "Calle Principal 123",
+  "ciudad": "Santiago",
+  "rol": "ROLE_USER"
+}
+Actualizar Perfil
+text
+PUT https://ms-usuario-5m0i.onrender.com/usuarios/perfil
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "nombre": "Juan Carlos Pérez",
+  "telefono": "+56 9 87654321",
+  "direccion": "Calle Nueva 456"
+}
+
+Response 200: OK
+Cambiar Contraseña
+text
+POST https://ms-usuario-5m0i.onrender.com/usuarios/cambiar-contraseña
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "contraseña_actual": "oldpassword123",
+  "contraseña_nueva": "newpassword123",
+  "confirmar_contraseña": "newpassword123"
+}
+
+Response 200: OK
+📦 MS CATÁLOGO - Productos
 Listar Productos
 text
-GET /api/productos?page=0&size=20&categoria=futbol
+GET https://ms-catalogo-hora.onrender.com/productos?page=0&size=20&categoria=futbol
 
 Response 200:
 {
@@ -145,7 +266,7 @@ Response 200:
 }
 Obtener Producto por ID
 text
-GET /api/productos/{id}
+GET https://ms-catalogo-hora.onrender.com/productos/{id}
 
 Response 200:
 {
@@ -163,7 +284,7 @@ Response 200:
 }
 Crear Producto (Admin)
 text
-POST /api/productos
+POST https://ms-catalogo-hora.onrender.com/productos
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -179,7 +300,7 @@ Content-Type: application/json
 Response 201: Created
 Actualizar Producto (Admin)
 text
-PUT /api/productos/{id}
+PUT https://ms-catalogo-hora.onrender.com/productos/{id}
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -192,14 +313,14 @@ Content-Type: application/json
 Response 200: OK
 Eliminar Producto (Admin)
 text
-DELETE /api/productos/{id}
+DELETE https://ms-catalogo-hora.onrender.com/productos/{id}
 Authorization: Bearer <token>
 
 Response 204: No Content
-Carrito
+🛒 MS CARRITO - Compras
 Obtener Carrito del Usuario
 text
-GET /api/carrito
+GET https://ms-carrito-zqlc.onrender.com/carrito
 Authorization: Bearer <token>
 
 Response 200:
@@ -219,7 +340,7 @@ Response 200:
 }
 Agregar Item al Carrito
 text
-POST /api/carrito/items
+POST https://ms-carrito-zqlc.onrender.com/carrito/items
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -231,7 +352,7 @@ Content-Type: application/json
 Response 201: Created
 Actualizar Cantidad en Carrito
 text
-PUT /api/carrito/items/{itemId}
+PUT https://ms-carrito-zqlc.onrender.com/carrito/items/{itemId}
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -242,20 +363,20 @@ Content-Type: application/json
 Response 200: OK
 Eliminar Item del Carrito
 text
-DELETE /api/carrito/items/{itemId}
+DELETE https://ms-carrito-zqlc.onrender.com/carrito/items/{itemId}
 Authorization: Bearer <token>
 
 Response 204: No Content
 Vaciar Carrito
 text
-DELETE /api/carrito
+DELETE https://ms-carrito-zqlc.onrender.com/carrito
 Authorization: Bearer <token>
 
 Response 204: No Content
-Órdenes
+📋 MS CARRITO - Órdenes
 Procesar Compra (Checkout)
 text
-POST /api/ordenes/checkout
+POST https://ms-carrito-zqlc.onrender.com/ordenes/checkout
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -277,7 +398,7 @@ Response 201: Created
 }
 Obtener Historial de Órdenes
 text
-GET /api/ordenes?page=0&size=10
+GET https://ms-carrito-zqlc.onrender.com/ordenes?page=0&size=10
 Authorization: Bearer <token>
 
 Response 200:
@@ -295,7 +416,7 @@ Response 200:
 }
 Obtener Detalles de Orden
 text
-GET /api/ordenes/{id}
+GET https://ms-carrito-zqlc.onrender.com/ordenes/{id}
 Authorization: Bearer <token>
 
 Response 200:
@@ -309,120 +430,47 @@ Response 200:
   "cliente": {...},
   "envio": {...}
 }
-Usuario
-Obtener Perfil
-text
-GET /api/usuarios/perfil
-Authorization: Bearer <token>
+🏠 Acceso Local (Desarrollo)
+Si ejecutas los microservicios localmente con Docker:
 
-Response 200:
-{
-  "id": 1,
-  "nombre": "Juan Pérez",
-  "email": "juan@example.com",
-  "telefono": "+56 9 12345678",
-  "direccion": "Calle Principal 123",
-  "ciudad": "Santiago",
-  "rol": "ROLE_USER"
-}
-Actualizar Perfil
-text
-PUT /api/usuarios/perfil
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "nombre": "Juan Carlos Pérez",
-  "telefono": "+56 9 87654321",
-  "direccion": "Calle Nueva 456"
-}
-
-Response 200: OK
-Cambiar Contraseña
-text
-POST /api/usuarios/cambiar-contraseña
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "contraseña_actual": "oldpassword123",
-  "contraseña_nueva": "newpassword123",
-  "confirmar_contraseña": "newpassword123"
-}
-
-Response 200: OK
-🚀 Instalación y Configuración
-Requisitos Previos
-Java 11+
-
-MySQL 8.0+ o PostgreSQL 12+
-
-Gradle 7.0+
-
-Git
-
-Pasos de Instalación
-1. Clonar Repositorio
 bash
-git clone <repository-url>
-cd mundopelota-api
-2. Configurar Base de Datos
-Crea la base de datos en MySQL:
+docker-compose up -d
+Las APIs estarían disponibles en:
 
-sql
-CREATE DATABASE mundopelota_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'mundopelota'@'localhost' IDENTIFIED BY 'password123';
-GRANT ALL PRIVILEGES ON mundopelota_db.* TO 'mundopelota'@'localhost';
-FLUSH PRIVILEGES;
-3. Configurar Propiedades
-Edita application.properties:
+MS Usuarios: http://localhost:8081
 
-text
-# Database
-spring.datasource.url=jdbc:mysql://localhost:3306/mundopelota_db
-spring.datasource.username=mundopelota
-spring.datasource.password=password123
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+MS Catálogo: http://localhost:8082
 
-# JPA/Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+MS Carrito: http://localhost:8083
 
-# JWT
-jwt.secret=tu_clave_secreta_muy_larga_y_segura_aqui_123456789
-jwt.expiration=86400000
-
-# Server
-server.port=8080
-server.servlet.context-path=/api
-4. Ejecutar la Aplicación
-bash
-./gradlew bootRun
-O ejecutar desde IDE:
-
-Click derecho en MundoPelotaApiApplication.java
-
-Seleccionar "Run"
-
-Acceder a la API
-Base URL: http://localhost:8080/api
-
-Swagger UI: http://localhost:8080/api/swagger-ui.html
-
-OpenAPI Docs: http://localhost:8080/api/v3/api-docs
-
+📊 Tabla Resumen de Microservicios
+Microservicio	URL Base	Swagger	Función Principal
+MS Usuarios	https://ms-usuario-5m0i.onrender.com	Link	Auth + Perfil
+MS Catálogo	https://ms-catalogo-hora.onrender.com	Link	Productos
+MS Carrito	https://ms-carrito-zqlc.onrender.com	Link	Carrito + Órdenes
 🧪 Testing
-Ejecutar Tests Unitarios
+Probar Endpoints con cURL
+Login
 bash
-./gradlew test
-Ejecutar Tests de Integración
+curl -X POST https://ms-usuario-5m0i.onrender.com/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "usuario@example.com",
+    "password": "password123"
+  }'
+Listar Productos
 bash
-./gradlew test --tests *IntegrationTest
-Coverage de Código
+curl -X GET "https://ms-catalogo-hora.onrender.com/productos?page=0&size=10"
+Agregar al Carrito (requiere token)
 bash
-./gradlew test jacocoTestReport
-📦 Dependencias Principales
+curl -X POST https://ms-carrito-zqlc.onrender.com/carrito/items \
+  -H "Authorization: Bearer <tu_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "producto_id": 1,
+    "cantidad": 2
+  }'
+🔨 Stack Tecnológico
 text
 dependencies {
     // Spring Boot
@@ -434,7 +482,6 @@ dependencies {
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-mysql'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt:0.11.5'
@@ -451,23 +498,17 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 🐛 Troubleshooting
-Error: Connection refused
-Solución: Verifica que MySQL esté corriendo:
+Error: Service Unavailable en Render
+Solución:
 
-bash
-# Linux/Mac
-sudo systemctl start mysql
+Render puede poner los servicios en sleep. Espera 30 segundos y reintenta
 
-# O verifica la conexión
-mysql -u mundopelota -p
-Error: Table doesn't exist
-Solución: Las tablas se crean automáticamente. Si no aparecen:
+Verifica que la URL sea exacta
 
-Verifica spring.jpa.hibernate.ddl-auto=update en properties
+Revisa el status en el dashboard de Render
 
-Reinicia la aplicación
-
-Revisa los logs
+Error: CORS
+Solución: Asegúrate que el header Authorization esté permitido en CORS
 
 Error: Invalid JWT Token
 Solución:
@@ -476,53 +517,27 @@ Token expirado: Usa refresh token
 
 Token inválido: Verifica que incluya "Bearer " en el header
 
-Clave secreta diferente: Asegúrate de usar la misma en cliente y servidor
+Usa el token correcto del microservicio de usuarios
 
-📊 Estadísticas de la API
-Recurso	Métodos	Auth	Descripción
-/auth	POST	No	Autenticación
-/productos	GET,POST,PUT,DELETE	Parcial	Gestión de productos
-/carrito	GET,POST,DELETE	Sí	Carrito de compras
-/ordenes	GET,POST	Sí	Gestión de órdenes
-/usuarios	GET,PUT,POST	Sí	Perfil de usuario
-🔄 CI/CD
-GitHub Actions (Ejemplo)
-text
-name: Build and Test
-on: [push, pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-      - name: Build with Gradle
-        run: ./gradlew build
 📚 Documentación Adicional
 Spring Boot Documentation
 
-JPA Documentation
-
-Spring Security
+Render Deployment
 
 JWT.io
+
+Swagger/OpenAPI
 
 👥 Contribuciones
 Fork el proyecto
 
-Crea una rama para tu feature (git checkout -b feature/nueva-caracteristica)
+Crea una rama para tu feature
 
-Commit tus cambios (git commit -m 'Agregar nueva característica')
+Commit tus cambios
 
-Push a la rama (git push origin feature/nueva-caracteristica)
+Push a la rama
 
 Abre un Pull Request
-
-📄 Licencia
-Este proyecto está bajo licencia MIT. Ver archivo LICENSE para más detalles.
 
 👤 Autores
 Desarrollador Principal: Dante Muñoz
@@ -532,3 +547,4 @@ Institución: Duoc UC
 Fecha: Diciembre 2025
 
 Última actualización: Diciembre 14, 2025
+
