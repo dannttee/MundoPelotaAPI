@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value; 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate; 
 import org.springframework.web.client.HttpClientErrorException; 
 import org.springframework.web.client.ResourceAccessException; 
@@ -24,30 +25,20 @@ public class UsuarioService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    /**
-     
-       @param usuarioId ID del usuario cuyo carrito debe vaciarse.
-     */
     private void vaciarCarritoRemoto(Long usuarioId) {
-
         final String vaciarUrl = carritoBaseUrl + "/api/carritos/vaciar/" + usuarioId;
         
         try {
             restTemplate.delete(vaciarUrl);
-            System.out.println("Carrito del usuario " + usuarioId + " vaciado exitosamente en el microservicio Carrito.");
-            
+            System.out.println("Carrito del usuario " + usuarioId + " vaciado exitosamente.");
         } catch (HttpClientErrorException ex) {
-
-            System.err.println("Error al intentar vaciar el carrito del usuario " + usuarioId + ". Código: " + ex.getStatusCode());
+            System.err.println("Error al vaciar carrito: " + ex.getStatusCode());
         } catch (ResourceAccessException ex) {
-
-            System.err.println("Advertencia: El servicio de Carrito no está accesible. No se pudo limpiar el carrito. " + ex.getMessage());
+            System.err.println("Servicio de carrito no accesible: " + ex.getMessage());
         } catch (Exception ex) {
-
-            System.err.println("Error desconocido al vaciar carrito: " + ex.getMessage());
+            System.err.println("Error desconocido: " + ex.getMessage());
         }
     }
-
 
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
@@ -61,6 +52,7 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    @Transactional
     public Usuario actualizar(@NonNull Long id, @NonNull Usuario usuario) {
         return usuarioRepository.findById(id).map(u -> {
             u.setNombre(usuario.getNombre());
@@ -70,17 +62,10 @@ public class UsuarioService {
         }).orElse(null);
     }
 
-    /**
-
-       @param id ID del usuario a eliminar.
-       @return true si se eliminó, false si no se encontró.
-     */
+    @Transactional
     public boolean eliminar(@NonNull Long id) {
         if (usuarioRepository.existsById(id)) {
-            // 1. Lógica de Integración: Primero limpiamos los datos asociados en el microservicio de Carrito
-            vaciarCarritoRemoto(id); 
-
-            // 2. Luego eliminamos el usuario de la DB local
+            vaciarCarritoRemoto(id);
             usuarioRepository.deleteById(id);
             return true;
         }
